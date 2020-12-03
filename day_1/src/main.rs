@@ -1,8 +1,7 @@
-
-fn part_one(input: &str) -> i64 {
-    let mut expenses = input.lines().filter_map(|expense| expense.parse::<i64>().ok()).collect::<Vec<_>>();
-    expenses.sort_unstable();
-
+///
+/// Task: Find two entries in a file that sum to the value '2020'.
+///
+fn part_one(expenses: &[i64]) -> i64 {
     let (mut l, mut r) = (0, expenses.len() - 1);
 
     loop {
@@ -11,17 +10,17 @@ fn part_one(input: &str) -> i64 {
         match result {
             std::cmp::Ordering::Less => l += 1,
             std::cmp::Ordering::Greater => r -= 1,
-            _ => break,
+            std::cmp::Ordering::Equal => break,
         }
     }
 
     expenses[l] * expenses[r]
 }
 
-fn part_two(input: &str) -> i64 {
-    let mut expenses = input.lines().filter_map(|expense| expense.parse::<i64>().ok()).collect::<Vec<_>>();
-    expenses.sort_unstable();
-
+///
+/// Task: Find three entries in a file that sum to the value '2020'
+///
+fn part_two(expenses: &[i64]) -> i64 {
     let (mut l, mut m, mut r) = (0, expenses.len() / 2, expenses.len() - 1);
 
     loop {
@@ -30,19 +29,23 @@ fn part_two(input: &str) -> i64 {
         match result {
             std::cmp::Ordering::Less => {
                 if l + 1 == m {
+                    // We've reached the biggest value that's smaller than
+                    // the middle value
                     m += 1
                 } else {
                     l += 1;
                 }
-            },
+            }
             std::cmp::Ordering::Greater => {
                 if r - 1 == m {
+                    // We've reach the smallest value that's bigger than
+                    // the middle value
                     m -= 1;
                 } else {
                     r -= 1;
                 }
-            },
-            _ => break,
+            }
+            std::cmp::Ordering::Equal => break,
         }
     }
 
@@ -51,6 +54,13 @@ fn part_two(input: &str) -> i64 {
 
 fn main() {
     let input = include_str!("input");
-    println!("{}", part_one(input));
-    println!("{}", part_two(input));
+
+    let mut expenses = input
+        .lines()
+        .filter_map(|expense| expense.parse::<i64>().ok())
+        .collect::<Vec<_>>();
+    expenses.sort_unstable();
+
+    println!("Answer for Part One: {}", part_one(&expenses));
+    println!("Answer for Part Two: {}", part_two(&expenses));
 }

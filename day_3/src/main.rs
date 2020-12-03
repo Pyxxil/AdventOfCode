@@ -1,10 +1,9 @@
-
-struct Point {
+struct Toboggan {
     x: usize,
     y: usize,
 }
 
-impl Point {
+impl Toboggan {
     pub fn new(x: usize, y: usize) -> Self {
         Self { x, y }
     }
@@ -23,35 +22,36 @@ impl Point {
     }
 }
 
-fn solve(input: &str, dx: usize, dy: usize) -> usize {
-    let map = input.lines().map(|line| line.trim().chars().collect::<Vec<_>>()).collect::<Vec<_>>();
-
+fn solve(map: &[Vec<char>], dx: usize, dy: usize) -> usize {
     let width = map[0].len();
 
-    let mut pos = Point::new(0, 0);
-
+    let mut toboggan = Toboggan::new(0, 0);
     let mut count = 0;
 
-    while pos.y() < map.len() {
-        if map[pos.y()][pos.x()] == '#' {
+    while toboggan.y() < map.len() {
+        if map[toboggan.y()][toboggan.x()] == '#' {
             count += 1;
         }
-        
-        pos.slide(dx, dy, width);
+
+        toboggan.slide(dx, dy, width);
     }
 
     count
 }
 
-
 fn main() {
     let input = include_str!("input");
-    let mut count = solve(input, 3, 1);
-    println!("{}", count);
+    let map = input
+        .lines()
+        .map(|line| line.trim().chars().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
 
-    for (dx, dy) in vec![(1usize, 1usize), (5, 1), (7, 1), (1, 2)].into_iter() {
-        count *= solve(input, dx, dy);
-    }
+    let count = solve(&map, 3, 1);
+    println!("Answer for Part One: {}", count);
 
-    println!("{}", count);
+    let product = vec![(1_usize, 1_usize), (5, 1), (7, 1), (1, 2)]
+        .into_iter()
+        .fold(count, |prod, (dx, dy)| prod * solve(&map, dx, dy));
+
+    println!("Answer for Part Two: {}", product);
 }
