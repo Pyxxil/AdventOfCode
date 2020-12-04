@@ -19,15 +19,15 @@ pub struct Passport {
 }
 
 impl Passport {
-    pub fn check(map: &HashMap<String, String>) -> bool {
-        PASSPORT_KEYS.iter().all(|key| map.contains_key(*key))
+    pub fn check(passport: &HashMap<String, String>) -> bool {
+        PASSPORT_KEYS.iter().all(|key| passport.contains_key(*key))
     }
 
-    pub fn from(map: &HashMap<String, String>) -> Result<Self, ()> {
-        let birth_year = map.get("byr").ok_or(())?.parse::<i32>().or(Err(()))?;
-        let issue_year = map.get("iyr").ok_or(())?.parse::<i32>().or(Err(()))?;
-        let expiration_year = map.get("eyr").ok_or(())?.parse::<i32>().or(Err(()))?;
-        let height = map
+    pub fn from(passport: &HashMap<String, String>) -> Result<Self, ()> {
+        let birth_year = passport.get("byr").ok_or(())?.parse::<i32>().or(Err(()))?;
+        let issue_year = passport.get("iyr").ok_or(())?.parse::<i32>().or(Err(()))?;
+        let expiration_year = passport.get("eyr").ok_or(())?.parse::<i32>().or(Err(()))?;
+        let height = passport
             .get("hgt")
             .ok_or(())?
             .chars()
@@ -35,15 +35,15 @@ impl Passport {
             .collect::<String>()
             .parse::<i32>()
             .or(Err(()))?;
-        let system = map
+        let system = passport
             .get("hgt")
             .ok_or(())?
             .chars()
             .skip_while(|ch| ch.is_digit(10))
             .collect::<String>();
-        let hair_colour = map.get("hcl").ok_or(())?.clone();
-        let eye_colour = map.get("ecl").ok_or(())?.clone();
-        let passport_id = map.get("pid").ok_or(())?.clone();
+        let hair_colour = passport.get("hcl").ok_or(())?.clone();
+        let eye_colour = passport.get("ecl").ok_or(())?.clone();
+        let passport_id = passport.get("pid").ok_or(())?.clone();
 
         Ok(Self {
             hair_colour,
