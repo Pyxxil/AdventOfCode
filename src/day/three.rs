@@ -78,9 +78,4 @@ impl Day for Three {
 
         map
     }
-
-    fn print_results(one: Self::Output, two: Self::Output) {
-        println!("Answer for Part One: {}", one);
-        println!("Answer for Part Two: {}", two);
-    }
 }
