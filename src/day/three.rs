@@ -49,18 +49,24 @@ impl Day for Three {
     type Input = Vec<Vec<char>>;
     type Output = usize;
 
+    ///
+    /// Task: Traverse a map and keep track of the number of trees
+    ///       encountered when moving right thrice, and down once.
+    ///
     fn part_one(input: &Self::Input) -> Self::Output {
         Three::solve(input, 3, 1)
     }
 
+    ///
+    /// Task: Traverse a map and keep track of the number of trees
+    ///       encountered when moving in specific directions.
+    ///
     fn part_two(input: &Self::Input) -> Self::Output {
-        let product = vec![(1_usize, 1_usize), (5, 1), (7, 1), (1, 2)]
+        vec![(1_usize, 1_usize), (5, 1), (7, 1), (1, 2)]
             .into_iter()
             .fold(Three::solve(input, 3, 1), |prod, (dx, dy)| {
                 prod * Three::solve(input, dx, dy)
-            });
-
-        product
+            })
     }
 
     fn get_input() -> Self::Input {

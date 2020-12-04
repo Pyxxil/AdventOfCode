@@ -8,6 +8,11 @@ impl Day for Two {
     type Input = Vec<(usize, usize, char, String)>;
     type Output = usize;
 
+    ///
+    /// Task: Determine the number of valid passwords, where a valid
+    ///       password contains a specific character a certain number
+    ///       of times (provided as 'x-y' in the file).
+    ///
     fn part_one(passwords: &Self::Input) -> Self::Output {
         passwords
             .iter()
@@ -18,6 +23,12 @@ impl Day for Two {
             .count()
     }
 
+    ///
+    /// Task: Determine the number of valid passwords, where a valid
+    ///       password has a particular character occur at position x
+    ///       or position y, but not both (where position x and y are
+    ///       provided as in `part_one`).
+    ///
     fn part_two(passwords: &Self::Input) -> Self::Output {
         passwords
             .iter()
