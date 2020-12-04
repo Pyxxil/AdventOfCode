@@ -12,14 +12,31 @@ pub trait Day {
     fn get_input() -> Self::Input;
 }
 
+macro_rules! time {
+    ($e:expr) => {
+        {
+            let start = std::time::Instant::now();
+            let res = $e;
+            let elapsed = start.elapsed().as_nanos();
+            (res, elapsed)
+        }
+    }
+}
+
 macro_rules! run {
     ($( $t:ty ),*) => {
         $(
             {
                 let input = <$t>::get_input();
+
                 println!("\nDay {}\n--------------------", stringify!($t));
-                println!("Results for Part One: {}", <$t>::part_one(&input));
-                println!("Results for Part One: {}", <$t>::part_two(&input));
+
+                let (results, elapsed) = time!(<$t>::part_one(&input));
+                println!("Results for Part One: {} (time: {}ns)", results, elapsed);
+
+                let (results, elapsed) = time!(<$t>::part_two(&input));
+                println!("Results for Part Two: {} (time: {}ns)", results, elapsed);
+
                 println!("--------------------");
             }
         )*
