@@ -1,8 +1,9 @@
 [package]
-name = "aoc"
+name = "calendar"
 version = "0.1.0"
 authors = ["Joshua Hill <josh@pyxxilated.studio>"]
 edition = "2018"
 
 [dependencies]
 regex = "1"
+structopt = "0.3"
