@@ -20,9 +20,7 @@ pub struct Passport {
 
 impl Passport {
     pub fn check(map: &HashMap<String, String>) -> bool {
-        PASSPORT_KEYS
-            .iter()
-            .all(|key| map.contains_key(&key.to_string()))
+        PASSPORT_KEYS.iter().all(|key| map.contains_key(*key))
     }
 
     pub fn from(map: &HashMap<String, String>) -> Result<Self, ()> {
@@ -60,27 +58,22 @@ impl Passport {
     }
 
     pub fn is_valid(&self) -> bool {
-        if self.birth_year < 1920 || self.birth_year > 2002 {
-            false
-        } else if self.issue_year < 2010 || self.issue_year > 2020 {
-            false
-        } else if self.expiration_year < 2020 || self.expiration_year > 2030 {
-            false
-        } else if self.hair_colour.len() != 7
+        if self.birth_year < 1920
+            || self.birth_year > 2002
+            || self.issue_year < 2010
+            || self.issue_year > 2020
+            || self.expiration_year < 2020
+            || self.expiration_year > 2030
+            || self.id.len() != 9
+            || self.hair_colour.len() != 7
             || self.hair_colour.chars().next().unwrap_or(' ') != '#'
             || self.hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16))
-        {
-            false
-        } else if !EYE_COLOURS.iter().any(|c| c == &self.eye_colour) {
-            false
-        } else if self.id.len() != 9 {
-            false
-        } else if !((self.system == "cm" && self.height >= 150 && self.height <= 193)
-            || (self.system == "in" && self.height >= 59 && self.height <= 76))
+            || !EYE_COLOURS.iter().any(|c| c == &self.eye_colour)
         {
             false
         } else {
-            true
+            (self.system == "cm" && self.height >= 150 && self.height <= 193)
+                || (self.system == "in" && self.height >= 59 && self.height <= 76)
         }
     }
 }
@@ -135,12 +128,12 @@ impl Day for Four {
 
         input
             .lines()
-            .map(|line| line.trim())
+            .map(&str::trim)
             .fold(vec![HashMap::new()], |mut passports, line| {
                 if line.is_empty() {
                     passports.push(HashMap::new());
                 } else {
-                    line.split(" ").for_each(|item| {
+                    line.split(' ').for_each(|item| {
                         let item = item.split(':').collect::<Vec<_>>();
 
                         passports
@@ -153,13 +146,7 @@ impl Day for Four {
                 passports
             })
             .into_iter()
-            .filter_map(|passport| {
-                if Passport::check(&passport) {
-                    Some(passport)
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>()
+            .filter(&Passport::check)
+            .collect()
     }
 }
