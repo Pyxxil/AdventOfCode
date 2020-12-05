@@ -7,74 +7,63 @@ pub struct Four {}
 static EYE_COLOURS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 static PASSPORT_KEYS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
-pub struct Passport {
-    hair_colour: String,
-    eye_colour: String,
-    birth_year: i32,
-    issue_year: i32,
-    height: i32,
-    system: String,
-    expiration_year: i32,
-    id: String,
-}
+pub struct Passport { }
 
 impl Passport {
-    pub fn check(passport: &HashMap<String, String>) -> bool {
+    pub fn check(passport: &&HashMap<String, String>) -> bool {
         PASSPORT_KEYS.iter().all(|key| passport.contains_key(*key))
     }
 
-    pub fn from(passport: &HashMap<String, String>) -> Result<Self, ()> {
-        let birth_year = passport.get("byr").ok_or(())?.parse::<i32>().or(Err(()))?;
-        let issue_year = passport.get("iyr").ok_or(())?.parse::<i32>().or(Err(()))?;
-        let expiration_year = passport.get("eyr").ok_or(())?.parse::<i32>().or(Err(()))?;
+    pub fn valid(passport: &&HashMap<String, String>) -> bool {
+        let empty = String::new();
+
+        let birth_year = passport.get("byr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        if birth_year < 1920 || birth_year > 2002 {
+            return false;
+        }
+
+        let issue_year = passport.get("iyr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        if issue_year < 2010 || issue_year > 2020 {
+            return false;
+        }
+
+        let expiration_year = passport.get("eyr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        if expiration_year < 2020 || expiration_year > 2030 {
+            return false;
+        }
+
+        let hair_colour = passport.get("hcl").unwrap_or(&empty);
+        if hair_colour.len() != 7 || hair_colour.chars().next().unwrap() != '#' 
+            || hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16)) {
+            return false;
+        }
+
+        let eye_colour = passport.get("ecl").unwrap_or(&empty);
+        if !EYE_COLOURS.iter().any(|c| c == &eye_colour) {
+            return false;
+        }
+
+        let passport_id = passport.get("pid").unwrap_or(&empty).clone();
+        if passport_id.len() != 9 || !passport_id.chars().all(|ch| ch.is_digit(10)) {
+            return false;
+        }
+
         let height = passport
             .get("hgt")
-            .ok_or(())?
+            .unwrap_or(&String::from("0"))
             .chars()
             .take_while(|ch| ch.is_digit(10))
             .collect::<String>()
-            .parse::<i32>()
-            .or(Err(()))?;
+            .parse::<i32>().unwrap();
         let system = passport
             .get("hgt")
-            .ok_or(())?
+            .unwrap_or(&String::from(""))
             .chars()
             .skip_while(|ch| ch.is_digit(10))
             .collect::<String>();
-        let hair_colour = passport.get("hcl").ok_or(())?.clone();
-        let eye_colour = passport.get("ecl").ok_or(())?.clone();
-        let passport_id = passport.get("pid").ok_or(())?.clone();
 
-        Ok(Self {
-            hair_colour,
-            eye_colour,
-            birth_year,
-            issue_year,
-            height,
-            system,
-            expiration_year,
-            id: passport_id,
-        })
-    }
-
-    pub fn is_valid(&self) -> bool {
-        if self.birth_year < 1920
-            || self.birth_year > 2002
-            || self.issue_year < 2010
-            || self.issue_year > 2020
-            || self.expiration_year < 2020
-            || self.expiration_year > 2030
-            || self.id.len() != 9
-            || self.hair_colour.len() != 7
-            || self.hair_colour.chars().next().unwrap_or(' ') != '#'
-            || self.hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16))
-            || !EYE_COLOURS.iter().any(|c| c == &self.eye_colour)
-        {
-            false
-        } else {
-            (self.system == "cm" && self.height >= 150 && self.height <= 193)
-                || (self.system == "in" && self.height >= 59 && self.height <= 76)
-        }
+        (system == "cm" && height >= 150 && height <= 193)
+                || (system == "in" && height >= 59 && height <= 76)
     }
 }
 
@@ -98,7 +87,10 @@ impl Day for Four {
     fn part_one(passports: &Self::Input) -> Self::Output {
         // Invalid (in accordance with this parts rules) will have been
         // filtered out before now
-        passports.len()
+        passports
+            .iter()
+            .filter(Passport::check)
+            .count()
     }
 
     ///
@@ -118,8 +110,7 @@ impl Day for Four {
     fn part_two(passports: &Self::Input) -> Self::Output {
         passports
             .iter()
-            .filter_map(|passport| Passport::from(passport).ok())
-            .filter(&Passport::is_valid)
+            .filter(Passport::valid)
             .count()
     }
 
@@ -134,19 +125,16 @@ impl Day for Four {
                     passports.push(HashMap::new());
                 } else {
                     line.split(' ').for_each(|item| {
-                        let item = item.split(':').collect::<Vec<_>>();
+                        let mut item = item.split(':');
 
                         passports
                             .last_mut()
                             .unwrap()
-                            .insert(item[0].to_string(), item[1].to_string());
+                            .insert(item.next().unwrap().to_string(), item.next().unwrap().to_string());
                     });
                 }
 
                 passports
             })
-            .into_iter()
-            .filter(&Passport::check)
-            .collect()
     }
 }
