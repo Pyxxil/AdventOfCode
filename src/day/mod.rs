@@ -14,14 +14,12 @@ pub trait Day {
 }
 
 macro_rules! time {
-    ($e:expr) => {
-        {
-            let start = std::time::Instant::now();
-            let res = $e;
-            let elapsed = start.elapsed().as_nanos();
-            (res, elapsed)
-        }
-    }
+    ($e:expr) => {{
+        let start = std::time::Instant::now();
+        let res = $e;
+        let elapsed = start.elapsed().as_nanos();
+        (res, elapsed)
+    }};
 }
 
 macro_rules! run {
@@ -33,10 +31,10 @@ macro_rules! run {
                 println!("\nDay {}\n--------------------", stringify!($t));
 
                 let (results, elapsed) = time!(<$t>::part_one(&input));
-                println!("Results for Part One: {} (time: {}ns)", results, elapsed);
+                println!("Results for Part One: {:>10} (time: {:>6}ns)", results, elapsed);
 
                 let (results, elapsed) = time!(<$t>::part_two(&input));
-                println!("Results for Part Two: {} (time: {}ns)", results, elapsed);
+                println!("Results for Part Two: {:>10} (time: {:>6}ns)", results, elapsed);
 
                 println!("--------------------");
             }

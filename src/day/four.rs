@@ -7,7 +7,7 @@ pub struct Four {}
 static EYE_COLOURS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 static PASSPORT_KEYS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
-pub struct Passport { }
+pub struct Passport {}
 
 impl Passport {
     pub fn check(passport: &&HashMap<String, String>) -> bool {
@@ -17,24 +17,38 @@ impl Passport {
     pub fn valid(passport: &&HashMap<String, String>) -> bool {
         let empty = String::new();
 
-        let birth_year = passport.get("byr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        let birth_year = passport
+            .get("byr")
+            .unwrap_or(&String::from("0"))
+            .parse::<i32>()
+            .unwrap_or(0);
         if birth_year < 1920 || birth_year > 2002 {
             return false;
         }
 
-        let issue_year = passport.get("iyr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        let issue_year = passport
+            .get("iyr")
+            .unwrap_or(&String::from("0"))
+            .parse::<i32>()
+            .unwrap_or(0);
         if issue_year < 2010 || issue_year > 2020 {
             return false;
         }
 
-        let expiration_year = passport.get("eyr").unwrap_or(&String::from("0")).parse::<i32>().unwrap_or(0);
+        let expiration_year = passport
+            .get("eyr")
+            .unwrap_or(&String::from("0"))
+            .parse::<i32>()
+            .unwrap_or(0);
         if expiration_year < 2020 || expiration_year > 2030 {
             return false;
         }
 
         let hair_colour = passport.get("hcl").unwrap_or(&empty);
-        if hair_colour.len() != 7 || hair_colour.chars().next().unwrap() != '#' 
-            || hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16)) {
+        if hair_colour.len() != 7
+            || hair_colour.chars().next().unwrap() != '#'
+            || hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16))
+        {
             return false;
         }
 
@@ -54,7 +68,8 @@ impl Passport {
             .chars()
             .take_while(|ch| ch.is_digit(10))
             .collect::<String>()
-            .parse::<i32>().unwrap();
+            .parse::<i32>()
+            .unwrap();
         let system = passport
             .get("hgt")
             .unwrap_or(&String::from(""))
@@ -63,7 +78,7 @@ impl Passport {
             .collect::<String>();
 
         (system == "cm" && height >= 150 && height <= 193)
-                || (system == "in" && height >= 59 && height <= 76)
+            || (system == "in" && height >= 59 && height <= 76)
     }
 }
 
@@ -87,10 +102,7 @@ impl Day for Four {
     fn part_one(passports: &Self::Input) -> Self::Output {
         // Invalid (in accordance with this parts rules) will have been
         // filtered out before now
-        passports
-            .iter()
-            .filter(Passport::check)
-            .count()
+        passports.iter().filter(Passport::check).count()
     }
 
     ///
@@ -108,10 +120,7 @@ impl Day for Four {
     ///        -cid (Country ID) - ignored, missing or not.
     ///
     fn part_two(passports: &Self::Input) -> Self::Output {
-        passports
-            .iter()
-            .filter(Passport::valid)
-            .count()
+        passports.iter().filter(Passport::valid).count()
     }
 
     fn get_input() -> Self::Input {
@@ -127,10 +136,10 @@ impl Day for Four {
                     line.split(' ').for_each(|item| {
                         let mut item = item.split(':');
 
-                        passports
-                            .last_mut()
-                            .unwrap()
-                            .insert(item.next().unwrap().to_string(), item.next().unwrap().to_string());
+                        passports.last_mut().unwrap().insert(
+                            item.next().unwrap().to_string(),
+                            item.next().unwrap().to_string(),
+                        );
                     });
                 }
 
