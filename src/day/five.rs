@@ -8,17 +8,13 @@ impl Day for Five {
 
     fn part_one(passes: &Self::Input) -> Self::Output {
         let (row, column) = passes.iter().fold((0, ""), |(max, st), pass| {
-            let row = pass
-                .chars()
-                .take_while(|ch| ch == &'F' || ch == &'B')
-                .fold((0, 127), |(min, max), p| {
-                    if p == 'F' {
-                        (min, (max - min) / 2 + min)
-                    } else {
-                        ((max - min) / 2 + min + 1, max)
-                    }
-                })
-                .0;
+            let row = pass.chars().take(7).enumerate().fold(0, |id, (idx, ch)| {
+                if ch == 'B' {
+                    id + (1 << (9 - idx))
+                } else {
+                    id
+                }
+            });
 
             if row > max {
                 (row, &pass)
@@ -27,50 +23,28 @@ impl Day for Five {
             }
         });
 
-        let column = column
-            .chars()
-            .skip_while(|ch| ch != &'L' && ch != &'R')
-            .fold((0, 7), |(min, max), p| {
-                if p == 'L' {
-                    (min, (max - min) / 2 + min)
-                } else {
-                    ((max - min) / 2 + min + 1, max)
-                }
-            })
-            .1;
+        let column = column.chars().skip(7).enumerate().fold(0, |id, (idx, ch)| {
+            if ch == 'R' {
+                id + (1 << (3 - idx))
+            } else {
+                id
+            }
+        });
 
-        row * 8 + column
+        row + column
     }
 
     fn part_two(passes: &Self::Input) -> Self::Output {
         let mut ids = passes
             .iter()
             .map(|pass| {
-                let (row, column): (String, String) =
-                    pass.chars().partition(|ch| ch == &'F' || ch == &'B');
-
-                let row = row
-                    .chars()
-                    .fold((0, 127), |(min, max), p| {
-                        if p == 'F' {
-                            (min, (max - min) / 2 + min)
-                        } else {
-                            ((max - min) / 2 + min + 1, max)
-                        }
-                    })
-                    .0;
-                let column = column
-                    .chars()
-                    .fold((0, 7), |(min, max), p| {
-                        if p == 'L' {
-                            (min, (max - min) / 2 + min)
-                        } else {
-                            ((max - min) / 2 + min + 1, max)
-                        }
-                    })
-                    .1;
-
-                row * 8usize + column
+                pass.chars().enumerate().fold(0, |id, (idx, ch)| {
+                    if ch == 'B' || ch == 'R' {
+                        id + (1 << (9 - idx))
+                    } else {
+                        id
+                    }
+                })
             })
             .collect::<Vec<_>>();
 
@@ -81,7 +55,8 @@ impl Day for Five {
             .skip(1)
             .find(|(idx, id)| ids[idx - 1] != *id - 1)
             .unwrap()
-            .1 - 1
+            .1
+            - 1
     }
 
     fn get_input() -> Self::Input {
