@@ -61,16 +61,16 @@ impl Day for Five {
     fn part_two(passes: &Self::Input) -> Self::Output {
         let mut ids = passes
             .iter()
-            .map(|pass| {
-                pass.chars().enumerate().fold(0, |id, (idx, ch)| {
+            .fold(Vec::with_capacity(passes.len()), |mut ids, pass| {
+                ids.push(pass.chars().enumerate().fold(0, |id, (idx, ch)| {
                     if ch == 'B' || ch == 'R' {
                         id + (1 << (9 - idx))
                     } else {
                         id
                     }
-                })
-            })
-            .collect::<Vec<_>>();
+                }));
+                ids
+            });
 
         ids.sort_unstable();
 
