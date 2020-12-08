@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 use crate::day::Day;
@@ -30,36 +30,19 @@ fn find_rules<'a>(parsed: &[&'a str]) -> HashMap<&'a str, usize> {
         })
 }
 
-fn reverse<'a>(graph: &Graph<'a>) -> Graph<'a> {
-    let mut rev = Graph::new();
+fn search<'a>(graph: &Graph<'a>, node: &'a str, mem: &mut HashMap<&'a str, bool>) -> bool {
+    if !mem.contains_key(node) {
+        let reaches = graph
+            .get(node)
+            .unwrap()
+            .iter()
+            .find(|(node, _)| **node == "shiny gold" || search(graph, node, mem))
+            .is_some();
 
-    graph.iter().for_each(|(node, edges)| {
-        edges.iter().for_each(|(n, w)| {
-            rev.entry(*n).or_insert_with(HashMap::new).insert(node, *w);
-        })
-    });
-
-    rev
-}
-
-fn search<'a>(graph: &Graph<'a>) -> usize {
-    fn inner<'a>(graph: &Graph<'a>, node: &'a str, mem: &mut HashSet<&'a str>) -> usize {
-        if mem.contains(node) {
-            0
-        } else {
-            mem.insert(node);
-
-            if let Some(edges) = graph.get(node) {
-                edges
-                    .iter()
-                    .fold(1, |count, (node, _)| count + inner(graph, node, mem))
-            } else {
-                1
-            }
-        }
+        mem.insert(node, reaches);
     }
 
-    inner(&reverse(graph), "shiny gold", &mut HashSet::new()) - 1
+    *mem.get(node).unwrap()
 }
 
 fn traverse<'a>(mapping: &Graph<'a>, rule: &HashMap<&'a str, usize>) -> usize {
@@ -73,7 +56,10 @@ impl<'a> Day for Seven<'a, ()> {
     type Output = usize;
 
     fn part_one(graph: &Self::Input) -> Self::Output {
-        search(graph)
+        graph
+            .iter()
+            .filter(|(node, _)| search(graph, node, &mut HashMap::new()))
+            .count()
     }
 
     fn part_two(graph: &Self::Input) -> Self::Output {
