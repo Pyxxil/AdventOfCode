@@ -7,12 +7,12 @@ pub struct Seven<'a, T: 'a> {
     data: PhantomData<&'a T>,
 }
 
-type Graph<'a> = HashMap<&'a str, HashMap<&'a str, usize>>;
+type Edges<'a> = HashMap<&'a str, usize>;
+type Graph<'a> = HashMap<&'a str, Edges<'a>>;
 
-fn find_rules<'a>(parsed: &[&'a str]) -> HashMap<&'a str, usize> {
+fn find_rules<'a>(parsed: &[&'a str]) -> Edges<'a> {
     parsed
         .iter()
-        .skip(1)
         .next()
         .unwrap()
         .split(',')
@@ -56,9 +56,10 @@ impl<'a> Day for Seven<'a, ()> {
     type Output = usize;
 
     fn part_one(graph: &Self::Input) -> Self::Output {
+        let mut mem = HashMap::new();
         graph
             .iter()
-            .filter(|(node, _)| search(graph, node, &mut HashMap::new()))
+            .filter(|(node, _)| search(graph, node, &mut mem))
             .count()
     }
 
@@ -70,11 +71,11 @@ impl<'a> Day for Seven<'a, ()> {
         let input = include_str!("input/day_seven");
 
         input.lines().fold(HashMap::new(), |mut graph, line| {
-            let parse = line.split(" contain ").collect::<Vec<_>>();
+            let mut parse = line.split(" contain ");
 
-            let for_rule = parse.first().unwrap().rsplit_once(' ').unwrap().0;
+            let for_rule = parse.next().unwrap().rsplit_once(' ').unwrap().0;
 
-            graph.insert(for_rule, find_rules(&parse));
+            graph.insert(for_rule, find_rules(&parse.collect::<Vec<_>>()));
 
             graph
         })
