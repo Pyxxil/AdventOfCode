@@ -10,11 +10,11 @@ static PASSPORT_KEYS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pi
 pub struct Passport {}
 
 impl Passport {
-    pub fn check(passport: &&HashMap<String, String>) -> bool {
+    pub fn check(passport: &HashMap<String, String>) -> bool {
         PASSPORT_KEYS.iter().all(|key| passport.contains_key(*key))
     }
 
-    pub fn valid(passport: &&HashMap<String, String>) -> bool {
+    pub fn valid(passport: &HashMap<String, String>) -> bool {
         let empty = String::new();
 
         let birth_year = passport
@@ -46,14 +46,14 @@ impl Passport {
 
         let hair_colour = passport.get("hcl").unwrap_or(&empty);
         if hair_colour.len() != 7
-            || hair_colour.chars().next().unwrap() != '#'
+            || !hair_colour.starts_with('#')
             || hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16))
         {
             return false;
         }
 
         let eye_colour = passport.get("ecl").unwrap_or(&empty);
-        if !EYE_COLOURS.iter().any(|c| c == &eye_colour) {
+        if !EYE_COLOURS.iter().any(|c| c == eye_colour) {
             return false;
         }
 
@@ -102,7 +102,10 @@ impl Day for Four {
     fn part_one(passports: &Self::Input) -> Self::Output {
         // Invalid (in accordance with this parts rules) will have been
         // filtered out before now
-        passports.iter().filter(Passport::check).count()
+        passports
+            .iter()
+            .filter(|passport| Passport::check(*passport))
+            .count()
     }
 
     ///
@@ -120,7 +123,10 @@ impl Day for Four {
     ///        -cid (Country ID) - ignored, missing or not.
     ///
     fn part_two(passports: &Self::Input) -> Self::Output {
-        passports.iter().filter(Passport::valid).count()
+        passports
+            .iter()
+            .filter(|passport| Passport::valid(*passport))
+            .count()
     }
 
     fn get_input() -> Self::Input {

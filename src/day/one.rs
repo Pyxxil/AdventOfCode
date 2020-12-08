@@ -46,7 +46,7 @@ impl Day for One {
                 }
                 std::cmp::Ordering::Greater => {
                     if r - 1 == m {
-                        // We've reach the smallest value that's bigger than
+                        // We've reached the smallest value that's bigger than
                         // the middle value
                         m -= 1;
                     } else {

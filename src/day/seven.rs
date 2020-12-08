@@ -31,23 +31,17 @@ fn search<'a>(
     mem: &mut HashMap<&'a str, bool>,
 ) -> bool {
     if !mem.contains_key(r) {
-        let res = 
-            rule.iter()
-                .find(|(r, v)| {
-                    if **v == 0 {
-                        false
-                    } else if *r == "shinygold" {
-                        true
-                    } else {
-                        search(mapping, mapping.get(*r).unwrap(), r, mem)
-                    }
-                })
-                .is_some();
+        let res = rule.iter().any(|(r, v)| {
+            if *v == 0 {
+                false
+            } else if r == "shinygold" {
+                true
+            } else {
+                search(mapping, mapping.get(r).unwrap(), r, mem)
+            }
+        });
 
-        mem.insert(
-            r,
-            res
-        );
+        mem.insert(r, res);
     }
 
     *mem.get(r).unwrap()
@@ -91,7 +85,7 @@ impl Day for Seven {
                 .take(2)
                 .collect::<String>();
 
-            mapping.insert(for_rule.to_string(), find_rules(&parse));
+            mapping.insert(for_rule, find_rules(&parse));
 
             mapping
         })

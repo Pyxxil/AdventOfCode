@@ -32,11 +32,15 @@ macro_rules! run {
 
                 println!("\nDay {}\n--------------------", stringify!($t));
 
-                let (results, elapsed) = time!(<$t>::part_one(&input));
-                println!("Results for Part One: {:>10} (time: {:>6}ns)", results, elapsed);
+                {
+                    let (results, elapsed) = time!(<$t>::part_one(&input));
+                    println!("Results for Part One: {:>10} (time: {:>6}ns)", results, elapsed);
+                }
 
-                let (results, elapsed) = time!(<$t>::part_two(&input));
-                println!("Results for Part Two: {:>10} (time: {:>6}ns)", results, elapsed);
+                {
+                    let (results, elapsed) = time!(<$t>::part_two(&input));
+                    println!("Results for Part Two: {:>10} (time: {:>6}ns)", results, elapsed);
+                }
 
                 println!("--------------------");
             }
