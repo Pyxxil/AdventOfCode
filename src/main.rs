@@ -3,7 +3,10 @@ use structopt::StructOpt;
 
 #[macro_use]
 mod day;
-use day::{five::Five, four::Four, one::One, seven::Seven, six::Six, three::Three, two::Two, Day};
+use day::{
+    five::Five, four::Four, one::One, seven::Seven as OtherSeven, six::Six, three::Three, two::Two,
+    Day,
+};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "calendar", about = "An Advent of Code Calendar")]
@@ -12,6 +15,8 @@ struct Opt {
     #[structopt(short, long = "day")]
     days: Vec<u64>,
 }
+
+type Seven<'a> = OtherSeven<'a, ()>;
 
 fn main() {
     let mut opt = Opt::from_args();

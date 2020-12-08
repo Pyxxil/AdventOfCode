@@ -1,13 +1,19 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::marker::PhantomData;
 
 use crate::day::Day;
 
-pub struct Seven {}
+pub struct Seven<'a, T: 'a> {
+    data: PhantomData<&'a T>,
+}
 
-fn find_rules(parsed: &[&str]) -> HashMap<String, usize> {
-    let rules = parsed.iter().skip(1).collect::<Vec<&&str>>();
-    rules
-        .first()
+type Graph<'a> = HashMap<&'a str, HashMap<&'a str, usize>>;
+
+fn find_rules<'a>(parsed: &[&'a str]) -> HashMap<&'a str, usize> {
+    parsed
+        .iter()
+        .skip(1)
+        .next()
         .unwrap()
         .split(',')
         .map(|rule| rule.trim().split_once(' ').unwrap())
@@ -16,7 +22,7 @@ fn find_rules(parsed: &[&str]) -> HashMap<String, usize> {
                 rules
             } else {
                 rules.insert(
-                    rule.1.split(' ').take(2).collect::<String>(),
+                    rule.1.rsplit_once(' ').unwrap().0,
                     rule.0.parse::<usize>().unwrap(),
                 );
                 rules
@@ -24,76 +30,67 @@ fn find_rules(parsed: &[&str]) -> HashMap<String, usize> {
         })
 }
 
-fn search<'a>(
-    mapping: &'a HashMap<String, HashMap<String, usize>>,
-    rule: &'a HashMap<String, usize>,
-    r: &'a str,
-    mem: &mut HashMap<&'a str, bool>,
-) -> bool {
-    if !mem.contains_key(r) {
-        let res = 
-            rule.iter()
-                .find(|(r, v)| {
-                    if **v == 0 {
-                        false
-                    } else if *r == "shinygold" {
-                        true
-                    } else {
-                        search(mapping, mapping.get(*r).unwrap(), r, mem)
-                    }
-                })
-                .is_some();
+fn reverse<'a>(graph: &Graph<'a>) -> Graph<'a> {
+    let mut rev = Graph::new();
 
-        mem.insert(
-            r,
-            res
-        );
-    }
+    graph.iter().for_each(|(node, edges)| {
+        edges.iter().for_each(|(n, w)| {
+            rev.entry(*n).or_insert_with(HashMap::new).insert(node, *w);
+        })
+    });
 
-    *mem.get(r).unwrap()
+    rev
 }
 
-fn traverse(
-    mapping: &HashMap<String, HashMap<String, usize>>,
-    rule: &HashMap<String, usize>,
-) -> usize {
+fn search<'a>(graph: &Graph<'a>) -> usize {
+    fn inner<'a>(graph: &Graph<'a>, node: &'a str, mem: &mut HashSet<&'a str>) -> usize {
+        if mem.contains(node) {
+            0
+        } else {
+            mem.insert(node);
+
+            if let Some(edges) = graph.get(node) {
+                edges
+                    .iter()
+                    .fold(1, |count, (node, _)| count + inner(graph, node, mem))
+            } else {
+                1
+            }
+        }
+    }
+
+    inner(&reverse(graph), "shiny gold", &mut HashSet::new()) - 1
+}
+
+fn traverse<'a>(mapping: &Graph<'a>, rule: &HashMap<&'a str, usize>) -> usize {
     rule.iter().fold(1, |count, (r, v)| {
         count + v * traverse(mapping, mapping.get(r).unwrap())
     })
 }
 
-impl Day for Seven {
-    type Input = HashMap<String, HashMap<String, usize>>;
+impl<'a> Day for Seven<'a, ()> {
+    type Input = Graph<'a>;
     type Output = usize;
 
-    fn part_one(mapping: &Self::Input) -> Self::Output {
-        let mut mem = HashMap::new();
-        mapping
-            .iter()
-            .filter(|(r, rule)| search(mapping, rule, r, &mut mem))
-            .count()
+    fn part_one(graph: &Self::Input) -> Self::Output {
+        search(graph)
     }
 
-    fn part_two(mapping: &Self::Input) -> Self::Output {
-        traverse(mapping, mapping.get("shinygold").unwrap()) - 1
+    fn part_two(graph: &Self::Input) -> Self::Output {
+        traverse(graph, graph.get("shiny gold").unwrap()) - 1
     }
 
     fn get_input() -> Self::Input {
         let input = include_str!("input/day_seven");
 
-        input.lines().fold(HashMap::new(), |mut mapping, line| {
+        input.lines().fold(HashMap::new(), |mut graph, line| {
             let parse = line.split(" contain ").collect::<Vec<_>>();
 
-            let for_rule = parse
-                .first()
-                .unwrap()
-                .split(' ')
-                .take(2)
-                .collect::<String>();
+            let for_rule = parse.first().unwrap().rsplit_once(' ').unwrap().0;
 
-            mapping.insert(for_rule.to_string(), find_rules(&parse));
+            graph.insert(for_rule, find_rules(&parse));
 
-            mapping
+            graph
         })
     }
 }
