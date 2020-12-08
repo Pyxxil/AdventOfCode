@@ -10,24 +10,21 @@ pub struct Seven<'a, T: 'a> {
 type Edges<'a> = HashMap<&'a str, usize>;
 type Graph<'a> = HashMap<&'a str, Edges<'a>>;
 
-fn find_rules<'a>(parsed: &[&'a str]) -> Edges<'a> {
+fn parse_edges(parsed: &str) -> Edges {
     parsed
-        .iter()
-        .next()
-        .unwrap()
         .split(',')
         .map(|rule| rule.trim().split_once(' ').unwrap())
-        .fold(HashMap::new(), |mut rules, rule| {
+        .filter_map(|rule| {
             if rule.0 == "no" {
-                rules
+                None
             } else {
-                rules.insert(
+                Some((
                     rule.1.rsplit_once(' ').unwrap().0,
                     rule.0.parse::<usize>().unwrap(),
-                );
-                rules
+                ))
             }
         })
+        .collect()
 }
 
 fn search<'a>(graph: &Graph<'a>, node: &'a str, mem: &mut HashMap<&'a str, bool>) -> bool {
@@ -35,9 +32,8 @@ fn search<'a>(graph: &Graph<'a>, node: &'a str, mem: &mut HashMap<&'a str, bool>
         let reaches = graph
             .get(node)
             .unwrap()
-            .iter()
-            .find(|(node, _)| **node == "shiny gold" || search(graph, node, mem))
-            .is_some();
+            .keys()
+            .any(|node| *node == "shiny gold" || search(graph, node, mem));
 
         mem.insert(node, reaches);
     }
@@ -70,14 +66,10 @@ impl<'a> Day for Seven<'a, ()> {
     fn get_input() -> Self::Input {
         let input = include_str!("input/day_seven");
 
-        input.lines().fold(HashMap::new(), |mut graph, line| {
-            let mut parse = line.split(" contain ");
-
-            let for_rule = parse.next().unwrap().rsplit_once(' ').unwrap().0;
-
-            graph.insert(for_rule, find_rules(&parse.collect::<Vec<_>>()));
-
-            graph
-        })
+        input
+            .lines()
+            .map(|line| line.split_once(" contain ").unwrap())
+            .map(|(node, edges)| (node.rsplit_once(' ').unwrap().0, parse_edges(edges)))
+            .collect()
     }
 }

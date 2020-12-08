@@ -36,20 +36,17 @@ impl Day for Six {
                 lines
             })
             .iter()
-            .fold(Vec::new(), |mut answers, answer| {
-                answers.push((
+            .map(|answer| {
+                (
                     answer.len(),
-                    answer
-                        .into_iter()
-                        .fold(HashMap::new(), |mut values, value| {
-                            value.chars().for_each(|ch| {
-                                values.insert(ch, values.get(&ch).unwrap_or(&0) + 1);
-                            });
-                            values
-                        }),
-                ));
-
-                answers
+                    answer.iter().fold(HashMap::new(), |mut values, value| {
+                        value
+                            .chars()
+                            .for_each(|ch| *values.entry(ch).or_insert(0) += 1);
+                        values
+                    }),
+                )
             })
+            .collect()
     }
 }

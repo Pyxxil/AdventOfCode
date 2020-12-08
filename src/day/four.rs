@@ -46,14 +46,14 @@ impl Passport {
 
         let hair_colour = passport.get("hcl").unwrap_or(&empty);
         if hair_colour.len() != 7
-            || hair_colour.chars().next().unwrap() != '#'
+            || !hair_colour.starts_with('#')
             || hair_colour.chars().skip(1).any(|ch| !ch.is_digit(16))
         {
             return false;
         }
 
         let eye_colour = passport.get("ecl").unwrap_or(&empty);
-        if !EYE_COLOURS.iter().any(|c| c == &eye_colour) {
+        if !EYE_COLOURS.iter().any(|c| c == eye_colour) {
             return false;
         }
 
