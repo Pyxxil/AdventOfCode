@@ -22,7 +22,7 @@ impl Passport {
             .unwrap_or(&String::from("0"))
             .parse::<i32>()
             .unwrap_or(0);
-        if birth_year < 1920 || birth_year > 2002 {
+        if !(1920..=2002).contains(&birth_year) {
             return false;
         }
 
@@ -31,7 +31,7 @@ impl Passport {
             .unwrap_or(&String::from("0"))
             .parse::<i32>()
             .unwrap_or(0);
-        if issue_year < 2010 || issue_year > 2020 {
+        if !(2010..=2020).contains(&issue_year) {
             return false;
         }
 
@@ -40,7 +40,7 @@ impl Passport {
             .unwrap_or(&String::from("0"))
             .parse::<i32>()
             .unwrap_or(0);
-        if expiration_year < 2020 || expiration_year > 2030 {
+        if !(2020..=2030).contains(&expiration_year) {
             return false;
         }
 
@@ -53,7 +53,7 @@ impl Passport {
         }
 
         let eye_colour = passport.get("ecl").unwrap_or(&empty);
-        if !EYE_COLOURS.iter().any(|c| c == eye_colour) {
+        if !EYE_COLOURS.contains(&eye_colour.as_str()) {
             return false;
         }
 

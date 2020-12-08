@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::day::Day;
 
-pub struct Eight {}
+pub struct Eight { }
 
 fn run(program: &[(String, i64)]) -> Option<i64> {
     let mut pc = 0;
@@ -71,19 +71,22 @@ impl Day for Eight {
     }
 
     fn part_two(program: &Self::Input) -> Self::Output {
+        let mut cloned_program = program.clone();
         program
             .iter()
             .enumerate()
             .find_map(|(idx, ins)| match ins.0.as_str() {
                 "jmp" => {
-                    let mut program = program.clone();
-                    program.get_mut(idx).unwrap().0 = "nop".to_string();
-                    run(&program)
+                    cloned_program.get_mut(idx).unwrap().0 = "nop".to_string();
+                    let acc = run(&cloned_program);
+                    cloned_program.get_mut(idx).unwrap().0 = "jmp".to_string();
+                    acc
                 }
                 "nop" => {
-                    let mut program = program.clone();
-                    program.get_mut(idx).unwrap().0 = "jmp".to_string();
-                    run(&program)
+                    cloned_program.get_mut(idx).unwrap().0 = "jmp".to_string();
+                    let acc = run(&cloned_program);
+                    cloned_program.get_mut(idx).unwrap().0 = "nop".to_string();
+                    acc
                 }
                 _ => None,
             })
