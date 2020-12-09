@@ -16,6 +16,7 @@ pub trait Day {
     fn get_input() -> Self::Input;
 }
 
+#[macro_export]
 macro_rules! time {
     ($e:expr) => {{
         let start = std::time::Instant::now();
@@ -25,6 +26,7 @@ macro_rules! time {
     }};
 }
 
+#[macro_export]
 macro_rules! run {
     ($( $t:ty ),*) => {
         $(

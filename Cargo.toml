@@ -4,7 +4,17 @@ version = "0.1.0"
 authors = ["Joshua Hill <josh@pyxxilated.studio>"]
 edition = "2018"
 
+[lib]
+
+
 [dependencies]
 regex = "1"
 structopt = "0.3"
 anyhow = "*"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "benchmark"
+harness = false

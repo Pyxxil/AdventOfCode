@@ -2,6 +2,23 @@ use crate::day::Day;
 
 pub struct One {}
 
+fn sum(expenses: &[i64], value: i64) -> Option<(i64, i64)> {
+    let mut iter = expenses.iter();
+
+    let mut left = iter.next().unwrap();
+    let mut right = iter.next_back().unwrap();
+
+        loop {
+            let result = (left + right).cmp(&value);
+
+            match result {
+                std::cmp::Ordering::Less => left = iter.next()?,
+                std::cmp::Ordering::Greater => right = iter.next_back()?,
+                std::cmp::Ordering::Equal => return Some((*left, *right)),
+            }
+        }
+}
+
 impl Day for One {
     type Input = Vec<i64>;
     type Output = i64;
@@ -10,54 +27,23 @@ impl Day for One {
     /// Task: Find two entries in a file that sum to the value '2020'.
     ///
     fn part_one(expenses: &Self::Input) -> Self::Output {
-        let (mut l, mut r) = (0, expenses.len() - 1);
-
-        loop {
-            let result = (expenses[l] + expenses[r]).cmp(&2020);
-
-            match result {
-                std::cmp::Ordering::Less => l += 1,
-                std::cmp::Ordering::Greater => r -= 1,
-                std::cmp::Ordering::Equal => break,
-            }
-        }
-
-        expenses[l] * expenses[r]
+        let (l, r) = sum(&expenses, 2020).unwrap();
+        l * r
     }
 
     ///
     /// Task: Find three entries in a file that sum to the value '2020'
     ///
     fn part_two(expenses: &Self::Input) -> Self::Output {
-        let (mut l, mut m, mut r) = (0, expenses.len() / 2, expenses.len() - 1);
+        let mut iter = expenses.iter();
 
-        loop {
-            let result = (expenses[l] + expenses[m] + expenses[r]).cmp(&2020);
-
-            match result {
-                std::cmp::Ordering::Less => {
-                    if l + 1 == m {
-                        // We've reached the biggest value that's smaller than
-                        // the middle value
-                        m += 1
-                    } else {
-                        l += 1;
-                    }
-                }
-                std::cmp::Ordering::Greater => {
-                    if r - 1 == m {
-                        // We've reached the smallest value that's bigger than
-                        // the middle value
-                        m -= 1;
-                    } else {
-                        r -= 1;
-                    }
-                }
-                std::cmp::Ordering::Equal => break,
+        while let Some(&v) = iter.next() {
+            if let Some((l, r)) = sum(iter.as_slice(), 2020 - v) {
+                return v * l * r;
             }
         }
 
-        expenses[l] * expenses[m] * expenses[r]
+        0
     }
 
     fn get_input() -> Self::Input {

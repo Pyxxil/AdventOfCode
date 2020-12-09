@@ -90,7 +90,7 @@ impl Day for Eight {
                 }
                 _ => None,
             })
-            .unwrap()
+            .expect("Could not find a swap that let's the program terminate")
     }
 
     fn get_input() -> Self::Input {
