@@ -2,14 +2,21 @@ use criterion::{criterion_group, criterion_main, Criterion};
 
 extern crate calendar;
 
-use calendar::{day::Day, one::One, two::Two, three::Three, four::Four, five::Five, six::Six, seven::Seven, eight::Eight};
+use calendar::{
+    day::Day, eight::Eight, five::Five, four::Four, one::One, seven::Seven, six::Six, three::Three,
+    two::Two,
+};
 
 macro_rules! bench_day {
     ($t:ty, $c:expr) => {
-            let input = <$t>::get_input();
-            $c.bench_function(&format!("Day {} Part 1", stringify!($t)), |b| b.iter(|| <$t>::part_one(&input) ));
-            $c.bench_function(&format!("Day {} Part 2", stringify!($t)), |b| b.iter(|| <$t>::part_two(&input) ));
-    }
+        let input = <$t>::get_input();
+        $c.bench_function(&format!("Day {} Part 1", stringify!($t)), |b| {
+            b.iter(|| <$t>::part_one(&input))
+        });
+        $c.bench_function(&format!("Day {} Part 2", stringify!($t)), |b| {
+            b.iter(|| <$t>::part_two(&input))
+        });
+    };
 }
 
 pub fn day_one(c: &mut Criterion) {
@@ -44,5 +51,7 @@ pub fn day_eight(c: &mut Criterion) {
     bench_day!(Eight, c);
 }
 
-criterion_group!(benches, day_one, day_two, day_three, day_four, day_five, day_six, day_seven, day_eight);
+criterion_group!(
+    benches, day_one, day_two, day_three, day_four, day_five, day_six, day_seven, day_eight
+);
 criterion_main!(benches);

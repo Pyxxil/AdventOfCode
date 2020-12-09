@@ -8,15 +8,15 @@ fn sum(expenses: &[i64], value: i64) -> Option<(i64, i64)> {
     let mut left = iter.next().unwrap();
     let mut right = iter.next_back().unwrap();
 
-        loop {
-            let result = (left + right).cmp(&value);
+    loop {
+        let result = (left + right).cmp(&value);
 
-            match result {
-                std::cmp::Ordering::Less => left = iter.next()?,
-                std::cmp::Ordering::Greater => right = iter.next_back()?,
-                std::cmp::Ordering::Equal => return Some((*left, *right)),
-            }
+        match result {
+            std::cmp::Ordering::Less => left = iter.next()?,
+            std::cmp::Ordering::Greater => right = iter.next_back()?,
+            std::cmp::Ordering::Equal => return Some((*left, *right)),
         }
+    }
 }
 
 impl Day for One {

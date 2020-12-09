@@ -2,9 +2,27 @@ use std::collections::HashSet;
 
 use crate::day::Day;
 
-pub struct Eight { }
+pub struct Eight {}
 
-fn run(program: &[(String, i64)]) -> Option<i64> {
+#[derive(Clone, Copy)]
+pub enum Op {
+    Nop(i64),
+    Jmp(i64),
+    Acc(i64),
+}
+
+impl From<&str> for Op {
+    fn from(s: &str) -> Self {
+        match s.split_once(' ').unwrap() {
+            ("nop", v) => Self::Nop(v.parse::<i64>().unwrap()),
+            ("jmp", v) => Self::Jmp(v.parse::<i64>().unwrap()),
+            ("acc", v) => Self::Acc(v.parse::<i64>().unwrap()),
+            _ => unreachable!(),
+        }
+    }
+}
+
+fn run(program: &[Op]) -> Option<i64> {
     let mut pc = 0;
     let mut acc = 0;
     let mut executed = HashSet::new();
@@ -16,17 +34,16 @@ fn run(program: &[(String, i64)]) -> Option<i64> {
             executed.insert(pc);
         }
 
-        if let Some((instruction, value)) = program.get(pc as usize) {
-            match instruction.as_str() {
-                "nop" => pc += 1,
-                "acc" => {
+        if let Some(instruction) = program.get(pc as usize) {
+            match instruction {
+                Op::Nop(_) => pc += 1,
+                Op::Acc(value) => {
                     acc += value;
                     pc += 1;
                 }
-                "jmp" => {
+                Op::Jmp(value) => {
                     pc += value;
                 }
-                _ => {}
             }
         } else {
             break;
@@ -37,7 +54,7 @@ fn run(program: &[(String, i64)]) -> Option<i64> {
 }
 
 impl Day for Eight {
-    type Input = Vec<(String, i64)>;
+    type Input = Vec<Op>;
     type Output = i64;
 
     fn part_one(program: &Self::Input) -> Self::Output {
@@ -52,18 +69,17 @@ impl Day for Eight {
                 executed.insert(pc);
             }
 
-            let (instruction, value) = program.get(pc as usize).unwrap();
+            let instruction = program.get(pc as usize).unwrap();
 
-            match instruction.as_str() {
-                "nop" => pc += 1,
-                "acc" => {
+            match instruction {
+                Op::Nop(_) => pc += 1,
+                Op::Acc(value) => {
                     acc += value;
                     pc += 1;
                 }
-                "jmp" => {
+                Op::Jmp(value) => {
                     pc += value;
                 }
-                _ => {}
             }
         }
 
@@ -72,20 +88,21 @@ impl Day for Eight {
 
     fn part_two(program: &Self::Input) -> Self::Output {
         let mut cloned_program = program.clone();
+
         program
             .iter()
             .enumerate()
-            .find_map(|(idx, ins)| match ins.0.as_str() {
-                "jmp" => {
-                    cloned_program.get_mut(idx).unwrap().0 = "nop".to_string();
+            .find_map(|(idx, instruction)| match instruction {
+                Op::Jmp(v) => {
+                    *cloned_program.get_mut(idx).unwrap() = Op::Nop(*v);
                     let acc = run(&cloned_program);
-                    cloned_program.get_mut(idx).unwrap().0 = "jmp".to_string();
+                    *cloned_program.get_mut(idx).unwrap() = Op::Jmp(*v);
                     acc
                 }
-                "nop" => {
-                    cloned_program.get_mut(idx).unwrap().0 = "jmp".to_string();
+                Op::Nop(v) => {
+                    *cloned_program.get_mut(idx).unwrap() = Op::Jmp(*v);
                     let acc = run(&cloned_program);
-                    cloned_program.get_mut(idx).unwrap().0 = "nop".to_string();
+                    *cloned_program.get_mut(idx).unwrap() = Op::Nop(*v);
                     acc
                 }
                 _ => None,
@@ -96,11 +113,6 @@ impl Day for Eight {
     fn get_input() -> Self::Input {
         let input = include_str!("input/day_eight");
 
-        input
-            .lines()
-            .map(&str::trim)
-            .map(|line| line.split_once(' ').unwrap())
-            .map(|(ins, val)| (ins.to_string(), val.parse::<i64>().unwrap()))
-            .collect()
+        input.lines().map(str::trim).map(Op::from).collect()
     }
 }
