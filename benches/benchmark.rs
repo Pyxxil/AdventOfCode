@@ -3,8 +3,8 @@ use criterion::{criterion_group, criterion_main, Criterion};
 extern crate calendar;
 
 use calendar::{
-    day::Day, eight::Eight, five::Five, four::Four, one::One, seven::Seven, six::Six, three::Three,
-    two::Two,
+    day::Day, eight::Eight, eleven::Eleven, five::Five, four::Four, nine::Nine, one::One,
+    seven::Seven, six::Six, ten::Ten, three::Three, two::Two,
 };
 
 macro_rules! bench_day {
@@ -51,7 +51,20 @@ pub fn day_eight(c: &mut Criterion) {
     bench_day!(Eight, c);
 }
 
+pub fn day_nine(c: &mut Criterion) {
+    bench_day!(Nine, c);
+}
+
+pub fn day_ten(c: &mut Criterion) {
+    bench_day!(Ten, c);
+}
+
+pub fn day_eleven(c: &mut Criterion) {
+    bench_day!(Eleven, c);
+}
+
 criterion_group!(
-    benches, day_one, day_two, day_three, day_four, day_five, day_six, day_seven, day_eight
+    benches, day_one, day_two, day_three, day_four, day_five, day_six, day_seven, day_eight,
+    day_nine, day_ten, day_eleven
 );
 criterion_main!(benches);
