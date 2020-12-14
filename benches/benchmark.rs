@@ -4,7 +4,7 @@ extern crate calendar;
 
 use calendar::{
     day::Day, eight::Eight, eleven::Eleven, five::Five, four::Four, nine::Nine, one::One,
-    seven::Seven, six::Six, ten::Ten, three::Three, two::Two, twelve::Twelve,
+    seven::Seven, six::Six, ten::Ten, three::Three, twelve::Twelve, two::Two,
 };
 
 macro_rules! bench_day {

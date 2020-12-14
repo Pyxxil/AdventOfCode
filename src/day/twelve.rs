@@ -2,47 +2,26 @@ use crate::day::Day;
 
 pub struct Twelve {}
 
-#[derive(Debug)]
+#[derive(Default)]
 struct Position {
     x: i32,
     y: i32,
 }
 
 impl Position {
-    fn distance_from(self, from: &Position) -> usize {
-        ((self.x - from.x).abs() + (self.y - from.y).abs()) as usize
+    fn distance_from(self, from: &Position) -> i32 {
+        (self.x - from.x).abs() + (self.y - from.y).abs()
     }
 
-    fn moved(self, direction: Direction, steps: i32) -> Self {
-        match direction {
-            Direction::North => Self {
-                x: self.x,
-                y: self.y + steps,
-            },
-            Direction::East => Self {
-                x: self.x + steps,
-                y: self.y,
-            },
-            Direction::South => Self {
-                x: self.x,
-                y: self.y - steps,
-            },
-            Direction::West => Self {
-                x: self.x - steps,
-                y: self.y,
-            },
-        }
-    }
-
-    fn moved2(self, waypoint: &Waypoint, steps: i32) -> Self {
+    fn moved(self, (dx, dy): (i32, i32)) -> Self {
         Self {
-            x: self.x + steps * waypoint.position.x,
-            y: self.y + steps * waypoint.position.y,
+            x: self.x + dx,
+            y: self.y + dy,
         }
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 enum Direction {
     North,
     East,
@@ -51,7 +30,7 @@ enum Direction {
 }
 
 impl Direction {
-    fn rotate(self, degrees: i32) -> Self {
+    fn rotated(self, degrees: i32) -> Self {
         match self {
             Self::North => match degrees {
                 90 => Self::East,
@@ -81,7 +60,6 @@ impl Direction {
     }
 }
 
-#[derive(Debug)]
 pub enum Action {
     North(i32),
     South(i32),
@@ -100,27 +78,30 @@ impl From<&str> for Action {
                 .skip(1)
                 .collect::<String>()
                 .parse::<i32>()
-                .unwrap(),
+                .expect("An Action requires a number as an operand"),
         ) {
             ('N', value) => Self::North(value),
-            ('S', value) => Self::South(value),
+            ('S', value) => Self::South(-value),
             ('E', value) => Self::East(value),
-            ('W', value) => Self::West(value),
+            ('W', value) => Self::West(-value),
             ('R', value) => Self::Right(value),
-            ('L', value) => Self::Left(value),
+            ('L', value) => Self::Left(360 - value),
             ('F', value) => Self::Forward(value),
             _ => unreachable!(),
         }
     }
 }
 
-#[derive(Debug)]
 struct Waypoint {
     position: Position,
 }
 
 impl Waypoint {
-    fn rotate(self, degrees: i32) -> Self {
+    fn at(position: Position) -> Self {
+        Self { position }
+    }
+
+    fn rotated(self, degrees: i32) -> Self {
         match degrees {
             90 => Self {
                 position: Position {
@@ -144,89 +125,74 @@ impl Waypoint {
         }
     }
 
-    fn moved(self, direction: Direction, steps: i32) -> Self {
+    fn moved(self, (dx, dy): (i32, i32)) -> Self {
         Self {
-            position: self.position.moved(direction, steps),
+            position: self.position.moved((dx, dy)),
         }
     }
 }
 
 impl Day for Twelve {
     type Input = Vec<Action>;
-    type Output = usize;
+    type Output = i32;
 
     fn part_one(actions: &Self::Input) -> Self::Output {
         actions
             .iter()
             .fold(
-                (Position { x: 0, y: 0 }, Direction::East),
-                |position, action| match action {
-                    Action::North(value) => {
-                        (position.0.moved(Direction::North, *value), position.1)
+                (Position::default(), Direction::East),
+                |position, action|
+                    match action {
+                    Action::North(value) | Action::South(value) => {
+                        (position.0.moved((0, *value)), position.1)
                     }
-                    Action::South(value) => {
-                        (position.0.moved(Direction::South, *value), position.1)
+                    Action::East(value) | Action::West(value) => {
+                        (position.0.moved((*value, 0)), position.1)
                     }
-                    Action::East(value) => (position.0.moved(Direction::East, *value), position.1),
-                    Action::West(value) => (position.0.moved(Direction::West, *value), position.1),
-                    Action::Right(degrees) => (position.0, position.1.rotate(*degrees)),
-                    Action::Left(degrees) => (position.0, position.1.rotate(360 - *degrees)),
-                    Action::Forward(value) => (position.0.moved(position.1, *value), position.1),
-                },
+                    Action::Right(degrees) | Action::Left(degrees) => {
+                        (position.0, position.1.rotated(*degrees))
+                    }
+                    Action::Forward(value) => (
+                        position.0.moved(match position.1 {
+                            Direction::North => (0, *value),
+                            Direction::South => (0, -*value),
+                            Direction::East => (*value, 0),
+                            Direction::West => (-*value, 0)
+                        }),
+                        position.1,
+                    ),
+                }
             )
             .0
-            .distance_from(&Position { x: 0, y: 0 })
+            .distance_from(&Position::default())
     }
 
     fn part_two(actions: &Self::Input) -> Self::Output {
         actions
             .iter()
             .fold(
-                (
-                    Position { x: 0, y: 0 },
-                    Waypoint {
-                        position: Position { x: 10, y: 1 },
-                    },
-                    Direction::East,
-                ),
-                |position, action| {
-                    match action {
-                        Action::North(value) => (
-                            position.0,
-                            position.1.moved(Direction::North, *value),
-                            position.2,
-                        ),
-                        Action::South(value) => (
-                            position.0,
-                            position.1.moved(Direction::South, *value),
-                            position.2,
-                        ),
-                        Action::East(value) => (
-                            position.0,
-                            position.1.moved(Direction::East, *value),
-                            position.2,
-                        ),
-                        Action::West(value) => (
-                            position.0,
-                            position.1.moved(Direction::West, *value),
-                            position.2,
-                        ),
-                        Action::Right(degrees) => {
-                            (position.0, position.1.rotate(*degrees), position.2)
-                        }
-                        Action::Left(degrees) => {
-                            (position.0, position.1.rotate(360 - *degrees), position.2)
-                        }
-                        Action::Forward(value) => (
-                            position.0.moved2(&position.1, *value),
-                            position.1,
-                            position.2,
-                        ),
+                (Position::default(), Waypoint::at(Position { x: 10, y: 1 })),
+                |position, action| match action {
+                    Action::North(value) | Action::South(value) => {
+                        (position.0, position.1.moved((0, *value)))
                     }
+                    Action::East(value) | Action::West(value) => {
+                        (position.0, position.1.moved((*value, 0)))
+                    }
+                    Action::Right(degrees) | Action::Left(degrees) => {
+                        (position.0, position.1.rotated(*degrees))
+                    }
+                    Action::Forward(value) => (
+                        position.0.moved((
+                            *value * position.1.position.x,
+                            *value * position.1.position.y,
+                        )),
+                        position.1,
+                    ),
                 },
             )
             .0
-            .distance_from(&Position { x: 0, y: 0 })
+            .distance_from(&Position::default())
     }
 
     fn get_input() -> Self::Input {
