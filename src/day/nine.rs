@@ -35,9 +35,9 @@ impl Day for Nine {
     type Output = i64;
 
     fn part_one(code: &Self::Input) -> Self::Output {
-        let mut iter = code.iter().enumerate().skip(25);
+        let iter = code.iter().enumerate().skip(25);
 
-        while let Some((idx, value)) = iter.next() {
+        for (idx, value) in iter {
             if !validate(&code[(idx - 25)..idx], *value) {
                 return *value;
             }
@@ -47,9 +47,9 @@ impl Day for Nine {
     }
 
     fn part_two(code: &Self::Input) -> Self::Output {
-        let mut iter = code.iter().enumerate().skip(25);
+        let iter = code.iter().enumerate().skip(25);
 
-        while let Some((idx, value)) = iter.next() {
+        for (idx, value) in iter {
             let combination = &code[(idx - 25)..idx];
             if !validate(combination, *value) {
                 return find_sum(&code[0..idx], *value);

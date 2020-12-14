@@ -6,7 +6,7 @@ use structopt::StructOpt;
 mod day;
 use day::{
     eight::Eight, eleven::Eleven, five::Five, four::Four, nine::Nine, one::One, seven::Seven,
-    six::Six, ten::Ten, three::Three, two::Two, Day,
+    six::Six, ten::Ten, three::Three, twelve::Twelve, two::Two, Day,
 };
 
 #[derive(Debug, StructOpt)]
@@ -21,7 +21,7 @@ fn main() {
     let mut opt = Opt::from_args();
 
     if opt.days.is_empty() {
-        opt.days = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        opt.days = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     }
 
     opt.days.into_iter().for_each(|day| match day {
@@ -36,6 +36,7 @@ fn main() {
         9 => run!(Nine),
         10 => run!(Ten),
         11 => run!(Eleven),
+        12 => run!(Twelve),
         _ => eprintln!("That day doesn't exist in the calendar or hasn't passed yet!"),
     });
 }
