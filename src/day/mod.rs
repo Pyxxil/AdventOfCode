@@ -7,6 +7,7 @@ pub mod one;
 pub mod seven;
 pub mod six;
 pub mod ten;
+pub mod thirteen;
 pub mod three;
 pub mod twelve;
 pub mod two;
@@ -41,12 +42,12 @@ macro_rules! run {
 
                 {
                     let (results, elapsed) = time!(<$t>::part_one(&input));
-                    println!("Results for Part One: {:>14} (time: {:>9}ns)", results, elapsed);
+                    println!("Results for Part One: {:>15} (time: {:>9}ns)", results, elapsed);
                 }
 
                 {
                     let (results, elapsed) = time!(<$t>::part_two(&input));
-                    println!("Results for Part Two: {:>14} (time: {:>9}ns)", results, elapsed);
+                    println!("Results for Part Two: {:>15} (time: {:>9}ns)", results, elapsed);
                 }
 
                 println!("--------------------");

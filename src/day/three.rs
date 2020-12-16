@@ -1,4 +1,4 @@
-use crate::day::Day;
+use crate::Day;
 
 struct Toboggan {
     x: usize,

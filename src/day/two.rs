@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::day::Day;
+use crate::Day;
 
 pub struct Two {}
 

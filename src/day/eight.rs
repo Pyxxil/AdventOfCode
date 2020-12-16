@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::day::Day;
+use crate::Day;
 
 pub struct Eight {}
 
