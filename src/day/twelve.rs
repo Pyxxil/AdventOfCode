@@ -92,15 +92,12 @@ impl From<&str> for Action {
     }
 }
 
+#[derive(Default)]
 struct Waypoint {
     position: Position,
 }
 
 impl Waypoint {
-    fn at(position: Position) -> Self {
-        Self { position }
-    }
-
     fn rotated(self, degrees: i32) -> Self {
         match degrees {
             90 => Self {
@@ -141,8 +138,7 @@ impl Day for Twelve {
             .iter()
             .fold(
                 (Position::default(), Direction::East),
-                |position, action|
-                    match action {
+                |position, action| match action {
                     Action::North(value) | Action::South(value) => {
                         (position.0.moved((0, *value)), position.1)
                     }
@@ -157,11 +153,11 @@ impl Day for Twelve {
                             Direction::North => (0, *value),
                             Direction::South => (0, -*value),
                             Direction::East => (*value, 0),
-                            Direction::West => (-*value, 0)
+                            Direction::West => (-*value, 0),
                         }),
                         position.1,
                     ),
-                }
+                },
             )
             .0
             .distance_from(&Position::default())
@@ -171,7 +167,7 @@ impl Day for Twelve {
         actions
             .iter()
             .fold(
-                (Position::default(), Waypoint::at(Position { x: 10, y: 1 })),
+                (Position::default(), Waypoint::default().moved((10, 1))),
                 |position, action| match action {
                     Action::North(value) | Action::South(value) => {
                         (position.0, position.1.moved((0, *value)))
