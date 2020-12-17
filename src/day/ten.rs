@@ -9,19 +9,19 @@ impl Day for Ten {
     type Output = i64;
 
     fn part_one(adapters: &Self::Input) -> Self::Output {
-        let (mut one, mut three) = (0, 1);
+        let (mut ones, mut threes) = (0, 1);
 
         adapters.iter().fold(0, |current, next| {
             match next - current {
-                1 => one += 1,
-                3 => three += 1,
+                1 => ones += 1,
+                3 => threes += 1,
                 _ => {}
             }
 
             *next
         });
 
-        one * three
+        ones * threes
     }
 
     fn part_two(adapters: &Self::Input) -> Self::Output {

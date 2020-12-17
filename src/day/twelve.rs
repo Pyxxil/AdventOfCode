@@ -9,8 +9,8 @@ struct Position {
 }
 
 impl Position {
-    fn distance_from(self, from: &Position) -> i32 {
-        (self.x - from.x).abs() + (self.y - from.y).abs()
+    fn distance(self) -> i32 {
+        self.x.abs() + self.y.abs()
     }
 
     fn moved(self, (dx, dy): (i32, i32)) -> Self {
@@ -160,7 +160,7 @@ impl Day for Twelve {
                 },
             )
             .0
-            .distance_from(&Position::default())
+            .distance()
     }
 
     fn part_two(actions: &Self::Input) -> Self::Output {
@@ -188,7 +188,7 @@ impl Day for Twelve {
                 },
             )
             .0
-            .distance_from(&Position::default())
+            .distance()
     }
 
     fn get_input() -> Self::Input {

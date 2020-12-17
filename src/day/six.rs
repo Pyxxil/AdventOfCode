@@ -25,7 +25,7 @@ impl Day for Six {
 
         input
             .lines()
-            .map(&str::trim)
+            .map(str::trim)
             .fold(vec![Vec::new()], |mut lines, line| {
                 if line.is_empty() {
                     lines.push(Vec::new());
