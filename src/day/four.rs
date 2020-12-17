@@ -10,10 +10,12 @@ static PASSPORT_KEYS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pi
 pub struct Passport {}
 
 impl Passport {
+    #[must_use = "Clippy said so"]
     pub fn check(passport: &HashMap<String, String>) -> bool {
         PASSPORT_KEYS.iter().all(|key| passport.contains_key(*key))
     }
 
+    #[must_use = "Clippy said so"]
     pub fn valid(passport: &HashMap<String, String>) -> bool {
         let empty = String::new();
 

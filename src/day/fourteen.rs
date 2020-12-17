@@ -4,11 +4,22 @@ use crate::Day;
 
 pub struct Fourteen {}
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 enum Bit {
     One,
     Zero,
-    X,
+    Floating,
+}
+
+impl From<char> for Bit {
+    fn from(ch: char) -> Self {
+        match ch {
+            'X' => Bit::Floating,
+            '1' => Bit::One,
+            '0' => Bit::Zero,
+            _ => unreachable!(),
+        }
+    }
 }
 
 pub struct Program {
@@ -30,19 +41,16 @@ impl Program {
 
     fn with(mut self, operations: &[Operation]) -> i64 {
         operations.iter().for_each(|operation| match operation {
-            Operation::SetMask(mask) => mask.chars().rev().enumerate().for_each(|(idx, bit)| {
-                self.mask[idx] = match bit {
-                    'X' => Bit::X,
-                    '1' => Bit::One,
-                    '0' => Bit::Zero,
-                    _ => unreachable!(),
-                }
-            }),
+            Operation::SetMask(mask) => mask
+                .chars()
+                .rev()
+                .enumerate()
+                .for_each(|(idx, bit)| self.mask[idx] = Bit::from(bit)),
             Operation::Write(address, value) => self.write(
                 *address,
                 self.mask.iter().enumerate().fold(0, |val, (idx, bit)| {
                     val | match bit {
-                        Bit::X => value & (1 << idx),
+                        Bit::Floating => value & (1 << idx),
                         Bit::One => 1 << idx,
                         Bit::Zero => 0,
                     }
@@ -55,21 +63,18 @@ impl Program {
 
     fn with2(mut self, operations: &[Operation]) -> i64 {
         operations.iter().for_each(|operation| match operation {
-            Operation::SetMask(mask) => mask.chars().rev().enumerate().for_each(|(idx, bit)| {
-                self.mask[idx] = match bit {
-                    'X' => Bit::X,
-                    '1' => Bit::One,
-                    '0' => Bit::Zero,
-                    _ => unreachable!(),
-                }
-            }),
+            Operation::SetMask(mask) => mask
+                .chars()
+                .rev()
+                .enumerate()
+                .for_each(|(idx, bit)| self.mask[idx] = Bit::from(bit)),
             Operation::Write(address, value) => {
                 self.mask
                     .iter()
                     .enumerate()
                     .fold(vec![*address], |mut addresses, (idx, bit)| {
                         match bit {
-                            Bit::X => {
+                            Bit::Floating => {
                                 addresses = addresses
                                     .iter()
                                     .flat_map(|addr| vec![*addr & !(1 << idx), *addr | (1 << idx)])
@@ -91,7 +96,6 @@ impl Program {
     }
 }
 
-#[derive(Debug)]
 pub enum Operation {
     SetMask(String),
     Write(usize, i64),
