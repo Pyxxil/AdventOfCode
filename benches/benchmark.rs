@@ -3,8 +3,9 @@ use criterion::{criterion_group, criterion_main, Criterion};
 extern crate calendar;
 
 use calendar::{
-    day::Day, eight::Eight, eleven::Eleven, five::Five, four::Four, nine::Nine, one::One,
-    seven::Seven, six::Six, ten::Ten, three::Three, twelve::Twelve, two::Two,
+    day::Day, eight::Eight, eleven::Eleven, fifteen::Fifteen, five::Five, four::Four,
+    fourteen::Fourteen, nine::Nine, one::One, seven::Seven, six::Six, sixteen::Sixteen, ten::Ten,
+    thirteen::Thirteen, three::Three, twelve::Twelve, two::Two,
 };
 
 macro_rules! bench_day {
@@ -67,8 +68,39 @@ pub fn day_twelve(c: &mut Criterion) {
     bench_day!(Twelve, c);
 }
 
+pub fn day_thirteen(c: &mut Criterion) {
+    bench_day!(Thirteen, c);
+}
+
+pub fn day_fourteen(c: &mut Criterion) {
+    bench_day!(Fourteen, c);
+}
+
+pub fn day_fifteen(c: &mut Criterion) {
+    bench_day!(Fifteen, c);
+}
+
+pub fn day_sixteen(c: &mut Criterion) {
+    bench_day!(Sixteen, c);
+}
+
 criterion_group!(
-    benches, day_one, day_two, day_three, day_four, day_five, day_six, day_seven, day_eight,
-    day_nine, day_ten, day_eleven, day_twelve,
+    benches,
+    day_one,
+    day_two,
+    day_three,
+    day_four,
+    day_five,
+    day_six,
+    day_seven,
+    day_eight,
+    day_nine,
+    day_ten,
+    day_eleven,
+    day_twelve,
+    day_thirteen,
+    day_fourteen,
+    day_fifteen,
+    day_sixteen
 );
 criterion_main!(benches);
