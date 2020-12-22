@@ -13,7 +13,7 @@ pub struct Rule {
 }
 
 impl Rule {
-    fn matches(&self, against: usize) -> bool {
+    fn allows(&self, against: usize) -> bool {
         self.ranges.iter().any(|range| range.contains(&against))
     }
 }
@@ -35,7 +35,7 @@ impl Day for Sixteen {
             .map(|nearby| {
                 nearby
                     .iter()
-                    .filter(|near| notes.notes.iter().all(|rule| !rule.matches(**near)))
+                    .filter(|near| notes.notes.iter().all(|rule| !rule.allows(**near)))
                     .sum::<usize>()
             })
             .sum()
@@ -48,7 +48,7 @@ impl Day for Sixteen {
             .filter(|nearby| {
                 nearby
                     .iter()
-                    .all(|near| notes.notes.iter().any(|rule| rule.matches(*near)))
+                    .all(|near| notes.notes.iter().any(|rule| rule.allows(*near)))
             })
             .collect::<Vec<_>>();
 
@@ -59,7 +59,7 @@ impl Day for Sixteen {
                 (
                     rule.field.clone(),
                     (0..notes.ticket.len())
-                        .filter(|idx| filtered.iter().all(|ticket| rule.matches(ticket[*idx])))
+                        .filter(|idx| filtered.iter().all(|ticket| rule.allows(ticket[*idx])))
                         .collect(),
                 )
             })
@@ -85,8 +85,15 @@ impl Day for Sixteen {
 
         known_ordering
             .into_iter()
-            .filter(|(field, _)| field.starts_with("departure"))
-            .fold(1, |count, (_, idx)| count * notes.ticket[idx])
+            .filter_map(|(field, idx)| {
+                if field.starts_with("departure") {
+                    Some(notes.ticket[idx])
+                } else {
+                    None
+                }
+            })
+            .fold_first(|count, value| count * value)
+            .unwrap_or(0)
     }
 
     fn get_input() -> Self::Input {
