@@ -92,7 +92,7 @@ impl Day for Sixteen {
                     None
                 }
             })
-            .fold_first(|count, value| count * value)
+            .reduce(|count, value| count * value)
             .unwrap_or(0)
     }
 
